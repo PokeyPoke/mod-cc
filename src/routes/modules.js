@@ -7,9 +7,9 @@ const moduleService = require('../services/modules');
 const router = express.Router();
 
 // Get all modules for user
-router.get('/list', verifyToken, checkSubscription(), (req, res) => {
+router.get('/list', verifyToken, checkSubscription(), async (req, res) => {
   try {
-    const modules = db.getUserModules(req.userId);
+    const modules = await db.getUserModules(req.userId);
     res.json(modules.map(module => ({
       ...module,
       config: JSON.parse(module.config)
@@ -20,13 +20,13 @@ router.get('/list', verifyToken, checkSubscription(), (req, res) => {
 });
 
 // Create new module
-router.post('/create', verifyToken, checkSubscription(), (req, res) => {
+router.post('/create', verifyToken, checkSubscription(), async (req, res) => {
   try {
     const { type, config } = validate(schemas.module.create, req.body);
     
     // Check module limit for free users
     if (req.user.subscription_level === 'free') {
-      const moduleCount = db.getModuleCount(req.userId);
+      const moduleCount = await db.getModuleCount(req.userId);
       if (moduleCount >= 5) {
         return res.status(403).json({ 
           error: 'Free tier limited to 5 modules. Upgrade to premium for unlimited modules.' 
@@ -40,10 +40,10 @@ router.post('/create', verifyToken, checkSubscription(), (req, res) => {
       return res.status(400).json({ error: 'Invalid module type' });
     }
     
-    const result = db.createModule(req.userId, type, JSON.stringify(config));
-    const moduleId = result.lastInsertRowid;
+    const result = await db.createModule(req.userId, type, JSON.stringify(config));
+    const moduleId = result.lastID;
     
-    const newModule = db.getModuleById(moduleId, req.userId);
+    const newModule = await db.getModuleById(moduleId, req.userId);
     
     res.status(201).json({
       ...newModule,
@@ -66,7 +66,7 @@ router.get('/:id/data', (req, res, next) => {
 }, async (req, res) => {
   try {
     const moduleId = parseInt(req.params.id);
-    const module = db.getModuleById(moduleId, req.userId);
+    const module = await db.getModuleById(moduleId, req.userId);
     
     if (!module) {
       return res.status(404).json({ error: 'Module not found' });
@@ -91,19 +91,19 @@ router.get('/:id/data', (req, res, next) => {
 });
 
 // Update module configuration
-router.put('/:id/config', verifyToken, checkSubscription(), (req, res) => {
+router.put('/:id/config', verifyToken, checkSubscription(), async (req, res) => {
   try {
     const moduleId = parseInt(req.params.id);
     const { config } = validate(schemas.module.update, req.body);
     
-    const module = db.getModuleById(moduleId, req.userId);
+    const module = await db.getModuleById(moduleId, req.userId);
     if (!module) {
       return res.status(404).json({ error: 'Module not found' });
     }
     
-    db.updateModuleConfig(moduleId, req.userId, JSON.stringify(config));
+    await db.updateModuleConfig(moduleId, req.userId, JSON.stringify(config));
     
-    const updatedModule = db.getModuleById(moduleId, req.userId);
+    const updatedModule = await db.getModuleById(moduleId, req.userId);
     res.json({
       ...updatedModule,
       config: JSON.parse(updatedModule.config)
@@ -114,16 +114,16 @@ router.put('/:id/config', verifyToken, checkSubscription(), (req, res) => {
 });
 
 // Delete module
-router.delete('/:id', verifyToken, checkSubscription(), (req, res) => {
+router.delete('/:id', verifyToken, checkSubscription(), async (req, res) => {
   try {
     const moduleId = parseInt(req.params.id);
     
-    const module = db.getModuleById(moduleId, req.userId);
+    const module = await db.getModuleById(moduleId, req.userId);
     if (!module) {
       return res.status(404).json({ error: 'Module not found' });
     }
     
-    db.deleteModule(moduleId, req.userId);
+    await db.deleteModule(moduleId, req.userId);
     res.json({ message: 'Module deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete module' });

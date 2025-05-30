@@ -35,7 +35,7 @@ class ModuleService {
     try {
       // Try to get user's API key first
       let apiKey = null;
-      const userApiKey = db.getApiKey(userId, 'openweathermap');
+      const userApiKey = await db.getApiKey(userId, 'openweathermap');
       if (userApiKey) {
         apiKey = decrypt(userApiKey.api_key);
       }

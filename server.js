@@ -97,18 +97,24 @@ process.on('SIGINT', () => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  
-  // Run database migration on startup
+async function startServer() {
   try {
-    require('./scripts/migrate')();
+    // Run database migration before starting server
+    console.log('Running database migration...');
+    await require('./scripts/migrate')();
     console.log('Database migration completed');
+    
+    // Start the HTTP server
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
   } catch (error) {
-    console.error('Database migration failed:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
-});
+}
+
+startServer();
 
 module.exports = app;
