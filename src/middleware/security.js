@@ -71,7 +71,7 @@ const corsOptions = {
     // In production, you should whitelist specific domains
     const allowedOrigins = [
       'http://localhost:3000',
-      'https://your-domain.herokuapp.com'
+      'https://mod-dis-a019ec8368db.herokuapp.com'
     ];
     
     if (process.env.NODE_ENV === 'development') {
