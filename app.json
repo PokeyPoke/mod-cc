@@ -1,0 +1,38 @@
+{
+  "name": "Modular Dashboard",
+  "description": "A customizable, widget-based dashboard platform",
+  "repository": "https://github.com/your-username/mod-cc",
+  "logo": "https://via.placeholder.com/128x128?text=MD",
+  "keywords": ["dashboard", "widgets", "nodejs", "iot", "modular"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "env": {
+    "NODE_ENV": {
+      "description": "Node environment",
+      "value": "production"
+    },
+    "JWT_SECRET": {
+      "description": "Secret key for JWT token signing",
+      "generator": "secret"
+    },
+    "ENCRYPTION_KEY": {
+      "description": "32-character key for API key encryption",
+      "generator": "secret"
+    }
+  },
+  "scripts": {
+    "postdeploy": "npm run migrate"
+  },
+  "success_url": "/",
+  "website": "https://your-app-name.herokuapp.com",
+  "addons": []
+}
