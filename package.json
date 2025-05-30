@@ -26,9 +26,8 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "bcrypt": "^5.1.1",
-    "better-sqlite3": "^8.7.0",
+    "sqlite3": "^5.1.6",
     "node-fetch": "^2.6.7",
-    "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "joi": "^17.9.2"
   },
@@ -36,6 +35,6 @@
     "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": "18.x"
   }
 }

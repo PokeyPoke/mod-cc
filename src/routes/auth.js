@@ -14,7 +14,7 @@ router.post('/register', async (req, res) => {
     const { email, password } = validate(schemas.user.register, req.body);
     
     // Check if user already exists
-    const existingUser = db.getUserByEmail(email);
+    const existingUser = await db.getUserByEmail(email);
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists' });
     }
@@ -23,11 +23,11 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 12);
     
     // Create user
-    const result = db.createUser(email, hashedPassword);
-    const userId = result.lastInsertRowid;
+    const result = await db.createUser(email, hashedPassword);
+    const userId = result.lastID;
     
     // Create default settings
-    db.createUserSettings(userId);
+    await db.createUserSettings(userId);
     
     // Generate tokens
     const token = generateToken(userId);
@@ -50,7 +50,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = validate(schemas.user.login, req.body);
     
     // Get user
-    const user = db.getUserByEmail(email);
+    const user = await db.getUserByEmail(email);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -81,7 +81,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Refresh token
-router.post('/refresh', (req, res) => {
+router.post('/refresh', async (req, res) => {
   try {
     const { refreshToken } = req.body;
     
@@ -95,7 +95,7 @@ router.post('/refresh', (req, res) => {
     }
     
     // Check if user still exists
-    const user = db.getUserById(decoded.userId);
+    const user = await db.getUserById(decoded.userId);
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
     }

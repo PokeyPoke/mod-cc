@@ -31,7 +31,7 @@ function verifyToken(req, res, next) {
   }
 }
 
-function verifyDeviceToken(req, res, next) {
+async function verifyDeviceToken(req, res, next) {
   const deviceKey = req.headers['x-device-key'];
   
   if (!deviceKey) {
@@ -39,7 +39,7 @@ function verifyDeviceToken(req, res, next) {
   }
 
   try {
-    const device = db.getDeviceByApiKey(deviceKey);
+    const device = await db.getDeviceByApiKey(deviceKey);
     if (!device) {
       return res.status(403).json({ error: 'Invalid device key' });
     }
@@ -49,7 +49,7 @@ function verifyDeviceToken(req, res, next) {
     req.deviceType = device.type;
     
     // Update last access
-    db.updateDeviceAccess(device.id);
+    await db.updateDeviceAccess(device.id);
     
     next();
   } catch (error) {
@@ -58,9 +58,9 @@ function verifyDeviceToken(req, res, next) {
 }
 
 function checkSubscription(requiredLevel = 'free') {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     try {
-      const user = db.getUserById(req.userId);
+      const user = await db.getUserById(req.userId);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -74,7 +74,7 @@ function checkSubscription(requiredLevel = 'free') {
         const expires = new Date(user.subscription_expires);
         if (expires < new Date()) {
           // Downgrade to free
-          db.updateUserSubscription(user.id, 'free', null);
+          await db.updateUserSubscription(user.id, 'free', null);
           user.subscription_level = 'free';
         }
       }

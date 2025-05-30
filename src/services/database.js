@@ -1,77 +1,94 @@
-const Database = require('better-sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 class DatabaseService {
   constructor() {
     const dbPath = process.env.DATABASE_URL || path.join(__dirname, '..', '..', 'database.sqlite');
-    this.db = new Database(dbPath);
-    this.db.exec('PRAGMA foreign_keys = ON');
+    this.db = new sqlite3.Database(dbPath);
+    this.db.run('PRAGMA foreign_keys = ON');
+  }
+
+  // Promisify database operations
+  run(sql, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.run(sql, params, function(err) {
+        if (err) reject(err);
+        else resolve({ lastID: this.lastID, changes: this.changes });
+      });
+    });
+  }
+
+  get(sql, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.get(sql, params, (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  }
+
+  all(sql, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.all(sql, params, (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
   }
 
   // User operations
-  createUser(email, hashedPassword) {
-    const stmt = this.db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
-    return stmt.run(email, hashedPassword);
+  async createUser(email, hashedPassword) {
+    return await this.run('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword]);
   }
 
-  getUserByEmail(email) {
-    const stmt = this.db.prepare('SELECT * FROM users WHERE email = ?');
-    return stmt.get(email);
+  async getUserByEmail(email) {
+    return await this.get('SELECT * FROM users WHERE email = ?', [email]);
   }
 
-  getUserById(id) {
-    const stmt = this.db.prepare('SELECT * FROM users WHERE id = ?');
-    return stmt.get(id);
+  async getUserById(id) {
+    return await this.get('SELECT * FROM users WHERE id = ?', [id]);
   }
 
-  updateUserSubscription(userId, level, expires) {
-    const stmt = this.db.prepare('UPDATE users SET subscription_level = ?, subscription_expires = ? WHERE id = ?');
-    return stmt.run(level, expires, userId);
+  async updateUserSubscription(userId, level, expires) {
+    return await this.run('UPDATE users SET subscription_level = ?, subscription_expires = ? WHERE id = ?', [level, expires, userId]);
   }
 
   // Module operations
-  createModule(userId, type, config = '{}') {
-    const stmt = this.db.prepare('INSERT INTO modules (user_id, type, config) VALUES (?, ?, ?)');
-    return stmt.run(userId, type, config);
+  async createModule(userId, type, config = '{}') {
+    return await this.run('INSERT INTO modules (user_id, type, config) VALUES (?, ?, ?)', [userId, type, config]);
   }
 
-  getUserModules(userId) {
-    const stmt = this.db.prepare('SELECT * FROM modules WHERE user_id = ? ORDER BY created_at');
-    return stmt.all(userId);
+  async getUserModules(userId) {
+    return await this.all('SELECT * FROM modules WHERE user_id = ? ORDER BY created_at', [userId]);
   }
 
-  getModuleById(id, userId) {
-    const stmt = this.db.prepare('SELECT * FROM modules WHERE id = ? AND user_id = ?');
-    return stmt.get(id, userId);
+  async getModuleById(id, userId) {
+    return await this.get('SELECT * FROM modules WHERE id = ? AND user_id = ?', [id, userId]);
   }
 
-  updateModuleConfig(id, userId, config) {
-    const stmt = this.db.prepare('UPDATE modules SET config = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?');
-    return stmt.run(config, id, userId);
+  async updateModuleConfig(id, userId, config) {
+    return await this.run('UPDATE modules SET config = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?', [config, id, userId]);
   }
 
-  deleteModule(id, userId) {
-    const stmt = this.db.prepare('DELETE FROM modules WHERE id = ? AND user_id = ?');
-    return stmt.run(id, userId);
+  async deleteModule(id, userId) {
+    return await this.run('DELETE FROM modules WHERE id = ? AND user_id = ?', [id, userId]);
   }
 
-  getModuleCount(userId) {
-    const stmt = this.db.prepare('SELECT COUNT(*) as count FROM modules WHERE user_id = ?');
-    return stmt.get(userId).count;
+  async getModuleCount(userId) {
+    const result = await this.get('SELECT COUNT(*) as count FROM modules WHERE user_id = ?', [userId]);
+    return result.count;
   }
 
   // Settings operations
-  getUserSettings(userId) {
-    const stmt = this.db.prepare('SELECT * FROM settings WHERE user_id = ?');
-    return stmt.get(userId);
+  async getUserSettings(userId) {
+    return await this.get('SELECT * FROM settings WHERE user_id = ?', [userId]);
   }
 
-  createUserSettings(userId, theme = 'light', layoutPreference = 'grid') {
-    const stmt = this.db.prepare('INSERT OR REPLACE INTO settings (user_id, theme, default_layout_preference) VALUES (?, ?, ?)');
-    return stmt.run(userId, theme, layoutPreference);
+  async createUserSettings(userId, theme = 'light', layoutPreference = 'grid') {
+    return await this.run('INSERT OR REPLACE INTO settings (user_id, theme, default_layout_preference) VALUES (?, ?, ?)', [userId, theme, layoutPreference]);
   }
 
-  updateUserSettings(userId, settings) {
+  async updateUserSettings(userId, settings) {
     const fields = [];
     const values = [];
     
@@ -87,86 +104,72 @@ class DatabaseService {
     if (fields.length === 0) return null;
     
     values.push(userId);
-    const stmt = this.db.prepare(`UPDATE settings SET ${fields.join(', ')} WHERE user_id = ?`);
-    return stmt.run(...values);
+    return await this.run(`UPDATE settings SET ${fields.join(', ')} WHERE user_id = ?`, values);
   }
 
   // API Keys operations
-  createApiKey(userId, service, encryptedKey) {
-    const stmt = this.db.prepare('INSERT INTO api_keys (user_id, service, api_key) VALUES (?, ?, ?)');
-    return stmt.run(userId, service, encryptedKey);
+  async createApiKey(userId, service, encryptedKey) {
+    return await this.run('INSERT INTO api_keys (user_id, service, api_key) VALUES (?, ?, ?)', [userId, service, encryptedKey]);
   }
 
-  getUserApiKeys(userId) {
-    const stmt = this.db.prepare('SELECT id, service, is_active, created_at FROM api_keys WHERE user_id = ? AND is_active = 1');
-    return stmt.all(userId);
+  async getUserApiKeys(userId) {
+    return await this.all('SELECT id, service, is_active, created_at FROM api_keys WHERE user_id = ? AND is_active = 1', [userId]);
   }
 
-  getApiKey(userId, service) {
-    const stmt = this.db.prepare('SELECT api_key FROM api_keys WHERE user_id = ? AND service = ? AND is_active = 1');
-    return stmt.get(userId, service);
+  async getApiKey(userId, service) {
+    return await this.get('SELECT api_key FROM api_keys WHERE user_id = ? AND service = ? AND is_active = 1', [userId, service]);
   }
 
-  deleteApiKey(userId, service) {
-    const stmt = this.db.prepare('UPDATE api_keys SET is_active = 0 WHERE user_id = ? AND service = ?');
-    return stmt.run(userId, service);
+  async deleteApiKey(userId, service) {
+    return await this.run('UPDATE api_keys SET is_active = 0 WHERE user_id = ? AND service = ?', [userId, service]);
   }
 
   // Device operations
-  createDevice(userId, name, type, apiKey = null) {
-    const stmt = this.db.prepare('INSERT INTO devices (user_id, name, type, api_key) VALUES (?, ?, ?, ?)');
-    return stmt.run(userId, name, type, apiKey);
+  async createDevice(userId, name, type, apiKey = null) {
+    return await this.run('INSERT INTO devices (user_id, name, type, api_key) VALUES (?, ?, ?, ?)', [userId, name, type, apiKey]);
   }
 
-  getUserDevices(userId) {
-    const stmt = this.db.prepare('SELECT * FROM devices WHERE user_id = ? ORDER BY created_at');
-    return stmt.all(userId);
+  async getUserDevices(userId) {
+    return await this.all('SELECT * FROM devices WHERE user_id = ? ORDER BY created_at', [userId]);
   }
 
-  getDeviceById(id, userId) {
-    const stmt = this.db.prepare('SELECT * FROM devices WHERE id = ? AND user_id = ?');
-    return stmt.get(id, userId);
+  async getDeviceById(id, userId) {
+    return await this.get('SELECT * FROM devices WHERE id = ? AND user_id = ?', [id, userId]);
   }
 
-  getDeviceByApiKey(apiKey) {
-    const stmt = this.db.prepare('SELECT * FROM devices WHERE api_key = ?');
-    return stmt.get(apiKey);
+  async getDeviceByApiKey(apiKey) {
+    return await this.get('SELECT * FROM devices WHERE api_key = ?', [apiKey]);
   }
 
-  updateDeviceAccess(id) {
-    const stmt = this.db.prepare('UPDATE devices SET last_access = CURRENT_TIMESTAMP WHERE id = ?');
-    return stmt.run(id);
+  async updateDeviceAccess(id) {
+    return await this.run('UPDATE devices SET last_access = CURRENT_TIMESTAMP WHERE id = ?', [id]);
   }
 
-  deleteDevice(id, userId) {
-    const stmt = this.db.prepare('DELETE FROM devices WHERE id = ? AND user_id = ?');
-    return stmt.run(id, userId);
+  async deleteDevice(id, userId) {
+    return await this.run('DELETE FROM devices WHERE id = ? AND user_id = ?', [id, userId]);
   }
 
   // Layout operations
-  getDeviceLayout(deviceId, deviceType) {
-    const stmt = this.db.prepare('SELECT layout_data FROM device_layouts WHERE device_id = ? AND device_type = ?');
-    const result = stmt.get(deviceId, deviceType);
+  async getDeviceLayout(deviceId, deviceType) {
+    const result = await this.get('SELECT layout_data FROM device_layouts WHERE device_id = ? AND device_type = ?', [deviceId, deviceType]);
     return result ? JSON.parse(result.layout_data) : [];
   }
 
-  saveDeviceLayout(deviceId, deviceType, layoutData) {
-    const stmt = this.db.prepare(`
+  async saveDeviceLayout(deviceId, deviceType, layoutData) {
+    return await this.run(`
       INSERT OR REPLACE INTO device_layouts (device_id, device_type, layout_data, updated_at) 
       VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-    `);
-    return stmt.run(deviceId, deviceType, JSON.stringify(layoutData));
+    `, [deviceId, deviceType, JSON.stringify(layoutData)]);
   }
 
-  getUserLayoutsByType(userId, deviceType) {
-    const stmt = this.db.prepare(`
+  async getUserLayoutsByType(userId, deviceType) {
+    const result = await this.get(`
       SELECT dl.layout_data FROM device_layouts dl
       JOIN devices d ON dl.device_id = d.id
       WHERE d.user_id = ? AND dl.device_type = ?
       ORDER BY dl.updated_at DESC
       LIMIT 1
-    `);
-    const result = stmt.get(userId, deviceType);
+    `, [userId, deviceType]);
     return result ? JSON.parse(result.layout_data) : [];
   }
 
