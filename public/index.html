@@ -3,90 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modular Dashboard</title>
+    <title>Modular Dashboard - Your Personalized Widget Platform</title>
+    <meta name="description" content="Experience the power of personalized dashboards with location-based widgets, real-time data, and customizable layouts.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="/css/homepage.css">
 </head>
 <body class="theme-light">
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1><i class="fas fa-th-large"></i> Modular Dashboard</h1>
-                <p>Your personalized, widget-based dashboard platform</p>
-            </div>
+    <div class="homepage-container">
+        <!-- Header -->
+        <header class="homepage-header">
+            <nav class="homepage-nav">
+                <a href="/" class="homepage-logo">
+                    <i class="fas fa-th-large"></i>
+                    Modular Dashboard
+                </a>
+                <div class="homepage-nav-buttons">
+                    <a href="/login.html" class="btn-outline">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+                    <a href="/login.html" class="btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Get Started
+                    </a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="homepage-hero">
+            <h1>Your Personalized Dashboard</h1>
+            <p>Experience real-time widgets with location-based data, weather tracking, and smart organization tools - all in one beautiful interface.</p>
             
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">Login</button>
-                <button class="auth-tab" data-tab="register">Register</button>
+            <div class="demo-notice">
+                <i class="fas fa-info-circle"></i>
+                This is a live demo dashboard showing widgets customized for your location
             </div>
-            
-            <div class="auth-content">
-                <!-- Login Form -->
-                <form id="login-form" class="auth-form active">
-                    <div class="form-group">
-                        <label for="login-email">Email</label>
-                        <input type="email" id="login-email" required>
+        </section>
+
+        <!-- Demo Dashboard -->
+        <section class="demo-dashboard">
+            <div class="demo-grid">
+                <!-- Weather Widget -->
+                <div class="demo-widget" id="weather-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i class="fas fa-cloud-sun"></i>
+                            Local Weather
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="login-password">Password</label>
-                        <input type="password" id="login-password" required>
+                    <div class="widget-content weather-content">
+                        <div class="loading-widget">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Detecting your location...</span>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
-                </form>
-                
-                <!-- Register Form -->
-                <form id="register-form" class="auth-form">
-                    <div class="form-group">
-                        <label for="register-email">Email</label>
-                        <input type="email" id="register-email" required>
+                </div>
+
+                <!-- Clock Widget -->
+                <div class="demo-widget" id="clock-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i class="fas fa-clock"></i>
+                            Current Time
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="register-password">Password</label>
-                        <input type="password" id="register-password" required minlength="6">
+                    <div class="widget-content clock-content">
+                        <div class="loading-widget">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading...</span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="register-confirm">Confirm Password</label>
-                        <input type="password" id="register-confirm" required minlength="6">
+                </div>
+
+                <!-- Quick Info Widget -->
+                <div class="demo-widget" id="quick-info-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i class="fas fa-lightbulb"></i>
+                            Feature Spotlight
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </button>
-                </form>
-            </div>
-            
-            <div class="auth-footer">
-                <div class="features">
-                    <div class="feature">
-                        <i class="fas fa-cubes"></i>
-                        <span>Modular Widgets</span>
+                    <div class="widget-content">
+                        <div class="loading-widget">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Loading...</span>
+                        </div>
                     </div>
-                    <div class="feature">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>Responsive Design</span>
+                </div>
+
+                <!-- Features Overview Widget -->
+                <div class="demo-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i class="fas fa-star"></i>
+                            Why Choose Modular Dashboard?
+                        </div>
                     </div>
-                    <div class="feature">
-                        <i class="fas fa-microchip"></i>
-                        <span>IoT Support</span>
+                    <div class="widget-content">
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fas fa-mobile-alt" style="color: var(--primary-color); width: 20px;"></i>
+                                <span>Responsive design for all devices</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fas fa-palette" style="color: var(--primary-color); width: 20px;"></i>
+                                <span>Multiple themes and customization</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fas fa-sync-alt" style="color: var(--primary-color); width: 20px;"></i>
+                                <span>Real-time data synchronization</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fas fa-shield-alt" style="color: var(--primary-color); width: 20px;"></i>
+                                <span>Secure and privacy-focused</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Stats Widget -->
+                <div class="demo-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i class="fas fa-chart-line"></i>
+                            Platform Stats
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+                            <div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary-color);">6</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Widget Types</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--accent-color);">∞</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Customization</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);">3</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Device Types</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--warning-color);">24/7</div>
+                                <div style="font-size: 0.9rem; color: var(--text-secondary);">Availability</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Tour Widget -->
+                <div class="demo-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">
+                            <i class="fas fa-rocket"></i>
+                            Getting Started
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div style="display: grid; gap: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="background: var(--primary-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">1</span>
+                                <span>Create your free account</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="background: var(--accent-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">2</span>
+                                <span>Add and customize widgets</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="background: var(--success-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">3</span>
+                                <span>Enjoy your personal dashboard</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Call to Action -->
+            <div class="cta-section">
+                <h2>Ready to Build Your Dashboard?</h2>
+                <p>Join thousands of users who have transformed their productivity with personalized, location-aware widgets.</p>
+                <div class="cta-buttons">
+                    <a href="/login.html" class="btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Create Free Account
+                    </a>
+                    <a href="/login.html" class="btn-outline">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </a>
+                </div>
+            </div>
+        </section>
     </div>
-    
-    <div id="loading" class="loading-overlay" style="display: none;">
-        <div class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading...</p>
-        </div>
-    </div>
-    
+
     <div id="toast-container" class="toast-container"></div>
-    
+
     <script src="/js/utils.js"></script>
-    <script src="/js/api.js"></script>
-    <script src="/js/auth.js"></script>
+    <script src="/js/homepage.js"></script>
 </body>
 </html>
