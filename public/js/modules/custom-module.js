@@ -140,7 +140,7 @@ class CustomModule extends BaseModule {
     // Basic CSS sanitization - remove potentially dangerous properties
     let sanitized = css.replace(/javascript\s*:/gi, '');
     sanitized = sanitized.replace(/expression\s*\(/gi, '');
-    sanitized = sanitized.replace/@import/gi, '');
+    sanitized = sanitized.replace(/@import/gi, '');
     sanitized = sanitized.replace(/behaviour\s*:/gi, '');
     sanitized = sanitized.replace(/-moz-binding\s*:/gi, '');
     
